@@ -19,7 +19,7 @@ router.get('/', function (req, res, next) {
 
 			}
 		});
-		res.render('index', {title: 'Nayak', photos: collectionPhotos});
+		res.render('index', {title: 'PhotoWala', photos: collectionPhotos});
 	});
 });
 
