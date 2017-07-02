@@ -1,0 +1,105 @@
+<!-- views/login.ejs -->
+<!doctype html>
+<html>
+<head>
+	<title>Node Authentication</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<!-- load bootstrap css -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<!-- load fontawesome -->
+	<style>
+		body {
+
+		}
+	</style>
+</head>
+<body>
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/">Nayak Photography</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<!--<ul class="nav navbar-nav">-->
+			<!--<li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>-->
+			<!--</ul>-->
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="/admin/logout">Logout</a></li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+	<div class="col-sm-3">
+		<ul>
+			<li>a</li>
+		</ul>
+	</div>
+
+	<div class="col-sm-9">
+		<% if (msg.length > 0) { %>
+		<div class="alert alert-info"><%= msg %></div>
+		<% } %>
+		<div class="panel panel-default">
+			<div class="panel-heading">Add new Photos</div>
+			<div class="panel-body">
+				<form action="/admin/add" method="post" enctype="multipart/form-data">
+					<div class="form-group">
+						<label for="photoname">Picture Title</label>
+						<input type="text" class="form-control" id="photoname" name="photoname"
+							   placeholder="Picture Title">
+					</div>
+					<div class="form-group">
+						<label for="collection">Select Collection : </label>
+						<select name="collection" id="collection">
+							<option value="">Select</option>
+							<% for(var i = 0; i < coll.length; i++) { %>
+							<option value="<%= coll[i] %>"><%= coll[i] %></option>
+							<% } %>
+						</select>
+					</div>
+					<p>OR</p>
+					<div class="form-group">
+						<label for="collectionName">Create New Collection : </label>
+						<input type="text" class="form-control" id="collectionName" name="collectionName"
+							   placeholder="Enter new Collection Name">
+					</div>
+					<div class="form-group">
+						<label for="photoFile">File input</label>
+						<input type="file" id="photoFile" name="photoFile">
+					</div>
+					<button type="submit" class="btn btn-default">Submit</button>
+				</form>
+			</div>
+		</div>
+
+		<% for( var cName in photoColl){ %>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><%= cName %></h3>
+			</div>
+			<div class="panel-body">
+				<% for(var i = 0; i < photoColl[cName].length; i++){ %>
+				<img src="<%= photoColl[cName][i].thumb %>" width="200px" style="width: 200px;height: 200px;" class="img-thumbnail"/>
+				<% } %>
+			</div>
+		</div>
+
+		<% } %>
+
+	</div>
+
+</div>
+</body>
+</html>

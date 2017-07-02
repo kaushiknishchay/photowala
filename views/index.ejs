@@ -1,11 +1,71 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
-</html>
+<% include ./partials/header %>
+
+<!-- container above -->
+<div class="hero">
+	<div class="hero__back hero__back--static"></div>
+	<div class="hero__back hero__back--mover"></div>
+	<div class="hero__front"></div>
+</div>
+<header class="codrops-header">
+	<h1 class="codrops-title"><%= title %> <span>Photography</span></h1>
+	<nav class="menu">
+		<a class="menu__item menu__item--current" href="#"><span>Work</span></a>
+		<a class="menu__item" href="#" data-modal="modal-12">
+			<button class="md-trigger" data-modal="modal-12"><span>Contact</span></button>
+		</a>
+	</nav>
+</header>
+<div class="stack-slider">
+	<div class="stacks-wrapper">
+
+		<% Object.keys(photos).forEach(function(key) { %>
+		<div class="stack">
+			<h2 class="stack-title"><a href="#" data-text="<%= key %>"><span><%= key %></span></a></h2>
+			<% photos[key].forEach(function(photo){ %>
+			<div class="item">
+				<div class="item__content">
+					<a href="<%= photo.url.replace('uploads','') %>">
+						<img src="<%= photo.url.replace('uploads','') %>" alt="<%= photo.name %>"/>
+					</a>
+					<h3 class="item__title"><%= photo.name %> <span class="item__date"><%= photo.date %></span></h3>
+					<div class="item__details">
+						<ul>
+							<% if(photo.camera) { %>
+							<li>
+								<i class="icon icon-camera"></i><span><%= photo.camera %></span>
+							</li>
+							<% } %>
+							<% if(photo.focal) { %>
+							<li>
+								<i class="icon icon-focal_length"></i><span><%= photo.focal %>mm</span>
+							</li>
+							<% } %>
+							<% if(photo.aperture) { %>
+							<li>
+								<i class="icon icon-aperture"></i><span>&fnof;/<%= photo.aperture %></span>
+							</li>
+							<% } %>
+							<% if(photo.exposure) { %>
+							<li>
+								<i class="icon icon-exposure_time"></i><span><%= photo.exposure %></span>
+							</li>
+							<% } %>
+							<% if(photo.iso) { %>
+							<li><i class="icon icon-iso"></i><span><%= photo.iso %></span></li>
+							<% } %>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<% });%>
+		</div>
+		<% }); %>
+
+	</div>
+	<!-- /stacks-wrapper -->
+</div>
+<!-- /stacks -->
+<img class="loader" src="img/three-dots.svg" width="60" alt="Loader image"/>
+
+
+<% include ./partials/footer %>
