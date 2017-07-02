@@ -9,7 +9,6 @@ var options = {
 	// pass: 'th3l30'
 };
 
-var dbHost = 'mongodb://theleo:th3l30@ds143532.mlab.com:43532/photography';
 
 var dbHostLocal = 'mongodb://localhost:27017/photography';
 
