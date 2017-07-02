@@ -11,6 +11,16 @@
 		body {
 
 		}
+		.img-wrap{
+			display: inline-block;
+			position: relative;
+			margin: 10px;
+		}
+		.photo-delete{
+			position: absolute;
+			right: 15px;
+			top: 15px;
+		}
 	</style>
 </head>
 <body>
@@ -91,7 +101,13 @@
 			</div>
 			<div class="panel-body">
 				<% for(var i = 0; i < photoColl[cName].length; i++){ %>
-				<img src="<%= photoColl[cName][i].thumb %>" width="200px" style="width: 200px;height: 200px;" class="img-thumbnail"/>
+				<a href="/admin/remove/<%= photoColl[cName][i]._id %>">
+					<div class="img-wrap">
+						<img src="<%= photoColl[cName][i].thumb %>" style="width: 200px;height: 200px;"
+							 class="img-thumbnail"/>
+						<i class="glyphicon glyphicon-remove photo-delete"></i>
+					</div>
+				</a>
 				<% } %>
 			</div>
 		</div>

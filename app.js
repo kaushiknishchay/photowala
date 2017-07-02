@@ -3,17 +3,12 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
 var flash = require('connect-flash');
 var session = require('express-session');
 var passport = require('passport');
 var mongodb = require('mongodb');
 var expressValidator = require('express-validator');
-var configDB = require('./config/database');
-mongoose.Promise = global.Promise;
-mongoose.connect(configDB.url,{ useMongoClient: true });
-var db = mongoose.connection;
-// var expressThumbnail = require('express-thumbnail');
+// var dbConnection = require('./config/database');
 
 
 var index = require('./routes/index');

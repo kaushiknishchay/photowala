@@ -31,7 +31,7 @@ var smooth_scroll_to = function(element, target, duration) {
         if(point >= end) { return 1; }
         var x = (point - start) / (end - start); // interpolation
         return x*x*(3 - 2*x);
-    }
+    };
 
     return new Promise(function(resolve, reject) {
         // This is to keep track of where the element's scrollTop is
@@ -69,9 +69,9 @@ var smooth_scroll_to = function(element, target, duration) {
 
             // schedule next frame for execution
             setTimeout(scroll_frame, 0);
-        }
+        };
 
         // boostrap the animation process
         setTimeout(scroll_frame, 0);
     });
-}
+};

@@ -1,10 +1,9 @@
 /**
  * Created by SHolmes on 01-Jul-17.
  */
-var mongoose =  require('mongoose')
+var mongoose =  require('mongoose');
 var Schema = mongoose.Schema;
 mongoose.set('debug', true);
-
 
 var photoSchema = new Schema({
 	name: String,
@@ -23,17 +22,3 @@ var photoSchema = new Schema({
 var Photo = mongoose.model('Photo', photoSchema, 'photos');
 
 module.exports = Photo;
-
-// module.exports = function Photo1() {
-// 	this.name = '';
-// 	this.collection = '';
-// 	this.url = '';
-// 	this.thumb = '';
-// 	this.date = '';
-// 	this.camera = '';
-// 	this.focal = '';
-// 	this.aperture = '';
-// 	this.exposure = '';
-// 	this.iso = '';
-//
-// };

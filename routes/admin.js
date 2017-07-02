@@ -3,35 +3,23 @@ var passport = require('passport');
 var bcrypt = require("bcrypt");
 var router = express.Router();
 var multer = require('multer');
-var mongoose = require('mongoose');
+
+var db = require('../config/database');
+
+// var mongoose = require('mongoose');
 var ExifImage = require('exif').ExifImage;
 var thumb = require('node-thumbnail').thumb;
-var dbHost = 'mongodb://theleo:th3l30@ds143532.mlab.com:43532/photography';
-var db = mongoose.createConnection(dbHost, {useMongoClient: false});//, {useMongoClient: true});
-var sync = require('synchronize');
+// var dbHost = 'mongodb://ds143532.mlab.com:43532/photography';
+// var db = mongoose.createConnection(dbHost, {
+// 	useMongoClient: false,
+// 	// user: 'theleo',
+// 	// pass: 'th3l30'
+// });//, {useMongoClient: true});
+
 var mongo = require('mongodb').MongoClient;
-var url = require('../config/database').url;
+var url = 'mongodb://localhost/photography';
 var Photo = require('../model/photo');
-
-
-// var Schema = mongoose.Schema;
-//
-// var photoSchema = new Schema({
-// 	name: String,
-// 	collectionName: String,
-// 	url: String,
-// 	thumb: String,
-// 	camera: String,
-// 	focal: String,
-// 	aperture: String,
-// 	exposure: String,
-// 	iso: String,
-// 	date: String
-//
-// });
-//
-// var Photo = mongoose.model('Photo', photoSchema, 'photos');
-
+var User = require('../model/users');
 
 var Storage = multer.diskStorage({
 	destination: function (req, file, callback) {
@@ -45,6 +33,29 @@ var Storage = multer.diskStorage({
 var upload = multer({
 	storage: Storage
 }).array("photoFile", 3); //Field name and max count
+
+
+// Authentication and Authorization Middleware
+var auth = function (req, res, next) {
+	if (req.session && req.session.admin && bcrypt.compareSync("nayak", req.session.user)) // true && req.session.admin)
+		return next();
+	else
+		return res.redirect('/admin/login');
+};
+
+
+router.get('/remove/:photo_id', auth, function (req, res, next) {
+
+	var photoId = req.params.photo_id;
+	console.log(photoId);
+
+	Photo.remove({_id: photoId}, function (err) {
+		if (err) return handleError(err);
+		req.flash('msg', 'Photo Deleted');
+		res.redirect('/admin/');
+	});
+
+});
 
 
 // SIGNUP ==============================
@@ -109,7 +120,7 @@ router.post('/signup', function (req, res, next) {
 
 router.get('/login', function (req, res, next) {
 	res.render('admin/login',
-			{message: req.flash('loginMessage')});
+			{message: req.flash('emsg')});
 });
 
 
@@ -118,39 +129,61 @@ router.post('/login', function (req, res, next) {
 	var username = req.body.username;
 	var password = req.body.password;
 
-
-	mongo.connect(url, function (err1, db) {
-
-		if (err1) {
-			res.send("Err Login Failed");
-		} else {
-
-			var cursor = db.collection('users').find({
-				username: username
-			}).limit(1);
-
-			cursor.count(function (err2, count) {
-				console.log(count);
-				if (!err2 && count !== 0) {
-					cursor.forEach(function (user) {
-						bcrypt.compare(password, user.password, function (err3, result) {
-							if (result === true) {
-								console.log("Success");
-								req.session.user = bcrypt.hashSync("nayak", 10);
-								req.session.admin = true;
-								// console.log(req.session);
-
-								res.redirect('/admin');
-							}
-						});
-					});
+	User.find({
+		username: username,
+	}).limit(1).then(function (doc) {
+		console.log('------------------= verifying user. =--------------');
+		if (doc.length > 0) {
+			var adminUser = doc[0];
+			let passHash = adminUser.password;
+			bcrypt.compare(password, passHash, function (err3, result) {
+				if (result === true) {
+					req.session.user = bcrypt.hashSync("nayak", 10);
+					req.session.admin = true;
+					res.redirect('/admin');
 				} else {
-
+					req.flash('emsg', 'Invalid Credentials');
 					res.redirect('/admin/login');
 				}
 			});
+		} else {
+			req.flash('emsg', 'Invalid Credentials');
+			res.redirect('/admin/login');
 		}
 	});
+
+	// mongo.connect(url, function (err1, db) {
+	//
+	// 	if (err1) {
+	// 		res.send("Err Login Failed");
+	// 	} else {
+	//
+	// 		var cursor = db.collection('users').find({
+	// 			username: username
+	// 		}).limit(1);
+	//
+	// 		cursor.count(function (err2, count) {
+	// 			console.log(count);
+	// 			if (!err2 && count !== 0) {
+	// 				cursor.forEach(function (user) {
+	// 					bcrypt.compare(password, user.password, function (err3, result) {
+	// 						if (result === true) {
+	// 							console.log("Success");
+	// 							req.session.user = bcrypt.hashSync("nayak", 10);
+	// 							req.session.admin = true;
+	// 							// console.log(req.session);
+	//
+	// 							res.redirect('/admin');
+	// 						}
+	// 					});
+	// 				});
+	// 			} else {
+	//
+	// 				res.redirect('/admin/login');
+	// 			}
+	// 		});
+	// 	}
+	// });
 
 });
 
@@ -162,14 +195,6 @@ router.get('/logout', function (req, res) {
 	res.send("logout success!");
 });
 
-
-// Authentication and Authorization Middleware
-var auth = function (req, res, next) {
-	if (req.session && req.session.admin && bcrypt.compareSync("nayak", req.session.user)) // true && req.session.admin)
-		return next();
-	else
-		return res.redirect('/admin/login');
-};
 
 // HOME ==============================
 router.post('/add', auth, function (req, res, next) {
@@ -221,7 +246,7 @@ router.post('/add', auth, function (req, res, next) {
 			});
 		});
 
-		req.flash('msg', 'Photo Uploaded!')
+		req.flash('msg', 'Photo Uploaded!');
 
 		res.redirect('/admin')
 	});
@@ -230,49 +255,29 @@ router.post('/add', auth, function (req, res, next) {
 
 router.get('/', auth, function (req, res, next) {
 
-	var collectionArray = [];
-	var collPhotos = [];
+	let collectionArray = [];
+	let collectionPhotos = [];
 
-	db.collection('photos').distinct('collectionName', function (error, names) {
-		names.forEach(function (name) {
-			collectionArray.push(name);
+	(Photo.find({})).then(function (photos) {
+
+		console.log(photos);
+
+		photos.forEach(function (photo) {
+			if (!collectionArray.hasOwnProperty(photo.collectionName)) {
+				console.log('createProperty');
+				collectionArray.push(photo.collectionName);
+				console.log(collectionArray);
+				if (collectionPhotos[photo.collectionName] === undefined) {
+					collectionPhotos[photo.collectionName] = [];
+				}
+				collectionPhotos[photo.collectionName].push(photo);
+
+			}
 		});
 
-		var itemP = 0;
-		for (var i = 0; i < collectionArray.length; i++) {
-
-			let name = collectionArray[i];
-			console.log(i);
-			console.log(name);
-			var photoArr = [];
-			db.collection('photos').find({collectionName: name}).forEach(function (photo) {
-				photoArr.push(photo);
-				// console.log(i);
-			}, function () {
-				itemP++;
-				collPhotos[name] = photoArr;
-				photoArr = [];
-				if (itemP >= collectionArray.length) {
-					console.log('3546565768r');
-					res.render('admin/home', {msg: req.flash('msg'), coll: collectionArray, photoColl: collPhotos});
-				}
-
-			});
-
-			// function (err) {
-			// 	collPhotos[name] = photoArr;
-			// 	console.log('eerrrr');
-			//
-			// 	if(i===collectionArray.length){
-			// 		console.log(i +' '+ name);
-			// 	}
-			// }
-
-		}
-
+		res.render('admin/home', {msg: req.flash('msg'), coll: collectionArray, photoColl: collectionPhotos});
 
 	});
-
 
 });
 
