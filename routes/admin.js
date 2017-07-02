@@ -152,39 +152,6 @@ router.post('/login', function (req, res, next) {
 		}
 	});
 
-	// mongo.connect(url, function (err1, db) {
-	//
-	// 	if (err1) {
-	// 		res.send("Err Login Failed");
-	// 	} else {
-	//
-	// 		var cursor = db.collection('users').find({
-	// 			username: username
-	// 		}).limit(1);
-	//
-	// 		cursor.count(function (err2, count) {
-	// 			console.log(count);
-	// 			if (!err2 && count !== 0) {
-	// 				cursor.forEach(function (user) {
-	// 					bcrypt.compare(password, user.password, function (err3, result) {
-	// 						if (result === true) {
-	// 							console.log("Success");
-	// 							req.session.user = bcrypt.hashSync("nayak", 10);
-	// 							req.session.admin = true;
-	// 							// console.log(req.session);
-	//
-	// 							res.redirect('/admin');
-	// 						}
-	// 					});
-	// 				});
-	// 			} else {
-	//
-	// 				res.redirect('/admin/login');
-	// 			}
-	// 		});
-	// 	}
-	// });
-
 });
 
 
