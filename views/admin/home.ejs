@@ -60,6 +60,9 @@
 		<% if (msg.length > 0) { %>
 		<div class="alert alert-info"><%= msg %></div>
 		<% } %>
+		<% if (emsg.length > 0) { %>
+		<div class="alert alert-danger"><%= emsg %></div>
+		<% } %>
 		<div class="panel panel-default">
 			<div class="panel-heading">Add new Photos</div>
 			<div class="panel-body">

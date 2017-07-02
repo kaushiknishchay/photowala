@@ -61,7 +61,7 @@ router.get('/remove/:photo_id', auth, function (req, res, next) {
 // SIGNUP ==============================
 
 router.get('/signup', function (req, res, next) {
-	res.render('admin/signup', {message: [{}]});
+	res.render('admin/signup', {message: [], emsg: req.flash('emsg')});
 });
 
 router.post('/signup', function (req, res, next) {
@@ -76,40 +76,31 @@ router.post('/signup', function (req, res, next) {
 		res.render('admin/signup', {message: errors});
 	} else {
 
-		var newUser = {
+		var newUser = new User({
 			username: username,
 			password: password
-		};
+		});
 
 		bcrypt.genSalt(10, function (err, salt) {
 			bcrypt.hash(newUser.password, salt, function (err, hash) {
 				newUser.password = hash;
-
-				mongo.connect(url, function (err, db) {
-					if (err) {
-						console.log(err);
-						res.send("Error Occurred.");
-					} else {
-						db.collection('users').find({}).count(function (err, count) {
-							if (count === 0) {
-								db.collection('users').insertOne(newUser, function (err, result) {
-									if (err) {
-										console.log(err);
-										res.send("Errr");
-									}
-									db.close();
-									res.redirect("/admin")
-								});
+				User.find({}).count(function (e, count) {
+					if (count === 0) {
+						newUser.save(function (err) {
+							if (err !== null) {
+								console.log(err);
+								req.flash('emsg', 'Account Creation Failed');
+								res.redirect("/admin/signup");
 							} else {
-								res.render('admin/signup', {
-									message: [{
-										msg: "No more users creation allowed."
-									}]
-								});
+								res.redirect("/admin")
 							}
 						});
+					} else {
+						req.flash('emsg', 'No More account creation allowed.');
+						res.redirect("/admin/signup");
 					}
 				});
+
 			});
 		});
 	}
@@ -155,9 +146,8 @@ router.post('/login', function (req, res, next) {
 });
 
 
-// Logout endpoint
+// Logout
 router.get('/logout', function (req, res) {
-
 	req.session.destroy();
 	res.send("logout success!");
 });
@@ -207,15 +197,16 @@ router.post('/add', auth, function (req, res, next) {
 			newPhoto.thumb = files[0].dstPath.replace('uploads/', '');
 			console.log(newPhoto);
 
-			db.collection('photos').insert(newPhoto).then(function (e, r) {
-				console.log(e);
-				console.log(r);
+			newPhoto.save(function (err) {
+				if (err) {
+					req.flash('emsg', 'Error! Photo NOT Uploaded!');
+					res.redirect('/admin')
+				} else {
+					req.flash('msg', 'Photo Uploaded!');
+					res.redirect('/admin')
+				}
 			});
 		});
-
-		req.flash('msg', 'Photo Uploaded!');
-
-		res.redirect('/admin')
 	});
 
 });
@@ -242,7 +233,12 @@ router.get('/', auth, function (req, res, next) {
 			}
 		});
 
-		res.render('admin/home', {msg: req.flash('msg'), coll: collectionArray, photoColl: collectionPhotos});
+		res.render('admin/home', {
+			msg: req.flash('msg'),
+			emsg: req.flash('emsg'),
+			coll: collectionArray,
+			photoColl: collectionPhotos
+		});
 
 	});
 

@@ -26,6 +26,9 @@
 		<div class="alert alert-danger"><%= message[i].msg %></div>
 		<% }%>
 		<% }%>
+		<% if (emsg.length > 0) { %>
+		<div class="alert alert-danger"><%= emsg %></div>
+		<% }%>
 
 		<!-- LOGIN FORM -->
 		<form action="/admin/signup" method="post">
