@@ -5,25 +5,25 @@
 Copy the repo and run
 `npm install`
 
-### `/config` folder
+### `/config`  folder
 1. database.js - Contains the DB Credentials
 
 
-### `/model` folder
+### `/model`  folder
 1. photo.js - Mongooe Photo Schema 
 2. users.js - Mongoose Users Schema
 
-### `/routes` folder
-1. index.js - Handles all the routes to the path > /
-2. admin.js - Handles all the routes to the path > /admin
+### `/routes`  folder
+1. index.js - Handles all the routes to the path `/`
+2. admin.js - Handles all the routes to the path `/admin`
 
-### `/views` folder
+### `/views`  folder
 1. index.ejs - View for the home page
 2. admin/\* - Admin Panel views
-3. partials/\* - Headera and footer views
+3. partials/\* - Header and footer views
 
 
-### `/uploads` folder
+### `/uploads`  folder
 + All the photos are uploaded to this folder
 
 
